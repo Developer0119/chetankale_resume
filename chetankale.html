@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chetan Kale </title>
+    <link rel="icon" type="image/png" href="Photo.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #020617;
+            --bg2: #07111f;
+            --surface: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.08);
+            --cyan: #00e5ff;
+            --pink: #ff0077;
+            --purple: #7c3aed;
+            --green: #10ffb3;
+            --text: #f5f7ff;
+            --muted: #9db0d1;
+            --radius: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(to bottom, var(--bg), #030b1b, #020617);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #bgCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #01040b;
+            z-index: 999999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .loader-ring {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--cyan);
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-text {
+            color: var(--cyan);
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 4px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--cyan);
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            font-size: 13px;
+            font-family: 'Share Tech Mono', monospace;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--cyan);
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 120px 60px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            align-items: center;
+            gap: 60px;
+            min-height: 100vh;
+        }
+
+        .hero-subtitle {
+            color: var(--cyan);
+            font-family: 'Share Tech Mono', monospace;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .hero h1 {
+            font-size: 95px;
+            line-height: 1;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 25px;
+        }
+
+        .gradient {
+            background: linear-gradient(90deg, var(--cyan), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--muted);
+            line-height: 1.9;
+            margin-bottom: 40px;
+            max-width: 700px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            transition: 0.4s;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .hero-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: var(--radius);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(var(--cyan), transparent);
+            top: -100px;
+            right: -100px;
+            opacity: 0.3;
+        }
+
+        .card-title {
+            color: var(--cyan);
+            margin-bottom: 20px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .big-number {
+            font-size: 60px;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        .tech-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .tech-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .section-title {
+            color: var(--cyan);
+            font-family: 'Share Tech Mono', monospace;
+            margin-bottom: 10px;
+        }
+
+        .section-heading {
+            font-size: 60px;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 50px;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+        }
+
+        .about-box,
+        .skill-card,
+        .project-card,
+        .service-card,
+        .timeline-card,
+        .agent-card,
+        .contact-card,
+        .future-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 35px;
+            backdrop-filter: blur(10px);
+            transition: 0.4s;
+        }
+
+        .about-box:hover,
+        .skill-card:hover,
+        .project-card:hover,
+        .service-card:hover,
+        .timeline-card:hover,
+        .agent-card:hover,
+        .contact-card:hover,
+        .future-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--cyan);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.15);
+        }
+
+        .about-box p {
+            line-height: 1.9;
+            color: var(--muted);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 18px;
+        }
+
+        .stat-card h3 {
+            font-size: 48px;
+            color: var(--cyan);
+            margin-bottom: 10px;
+        }
+
+        .skills-grid,
+        .projects-grid,
+        .services-grid,
+        .future-grid,
+        .agent-grid,
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .skill-card h3,
+        .project-card h3,
+        .service-card h3,
+        .future-card h3,
+        .agent-card h3 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .progress {
+            margin-bottom: 20px;
+        }
+
+        .progress-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .bar {
+            width: 100%;
+            height: 8px;
+            border-radius: 100px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--pink));
+        }
+
+        .project-image {
+            height: 240px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 80px;
+            background: linear-gradient(135deg, #081224, #0c1d3a, #111827);
+        }
+
+        .project-card p,
+        .service-card p,
+        .future-card p,
+        .agent-card p,
+        .timeline-card p {
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .tag {
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .timeline-year {
+            color: var(--cyan);
+            margin-bottom: 12px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .ai-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 30px;
+        }
+
+        .dashboard-card h2 {
+            color: var(--cyan);
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .contact-section {
+            text-align: center;
+        }
+
+        .contact-section h2 {
+            font-size: 70px;
+            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .contact-section p {
+            max-width: 700px;
+            margin: auto;
+            color: var(--muted);
+            line-height: 1.9;
+            margin-bottom: 60px;
+        }
+
+        .contact-card h4 {
+            margin-bottom: 15px;
+            color: var(--cyan);
+        }
+
+        footer {
+            padding: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(var(--cyan), transparent 70%);
+            opacity: 0.08;
+            border-radius: 50%;
+            filter: blur(30px);
+        }
+
+        .glow1 {
+            top: 100px;
+            left: -100px;
+        }
+
+        .glow2 {
+            bottom: 0;
+            right: -100px;
+        }
+
+        @media(max-width:1000px) {
+
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 70px;
+            }
+
+            .section-heading {
+                font-size: 45px;
+            }
+
+            .contact-section h2 {
+                font-size: 50px;
+            }
+
+        }
+
+        @media(max-width:700px) {
+
+            nav {
+                padding: 20px;
+            }
+
+            .page {
+                padding: 120px 20px;
+            }
+
+            .hero h1 {
+                font-size: 50px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+        }
+
+        .download-btn {
+            padding: 12px 22px;
+            background: linear-gradient(90deg, #00e5ff, #7c3aed);
+            border-radius: 10px;
+            color: white !important;
+            font-family: 'Share Tech Mono', monospace;
+            transition: 0.4s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.25);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+        }
+
+        .social-card {
+            text-decoration: none;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: 0.5s;
+        }
+
+        .social-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            border-color: #00e5ff;
+            box-shadow: 0 0 35px rgba(0, 229, 255, 0.25);
+        }
+
+        .social-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            margin-bottom: 25px;
+            transition: 0.5s;
+        }
+
+        .social-icon img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .social-card:hover .social-icon {
+            transform: rotate(8deg) scale(1.1);
+        }
+
+        .linkedin-bg {
+            background: linear-gradient(135deg, #0077b5, #00a0dc);
+        }
+
+        .github-bg {
+            background: linear-gradient(135deg, #111, #333);
+        }
+
+        .email-bg {
+            background: linear-gradient(135deg, #ff4b2b, #ff416c);
+        }
+
+        .phone-bg {
+            background: linear-gradient(135deg, #00c853, #64dd17);
+        }
+
+        .location-bg {
+            background: linear-gradient(135deg, #ff9800, #ff5722);
+        }
+
+        .ai-bg {
+            background: linear-gradient(135deg, #7c3aed, #00e5ff);
+        }
+
+        .contact-card h4 {
+            margin-bottom: 15px;
+            color: #00e5ff;
+            letter-spacing: 2px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .contact-card p {
+            color: #9db0d1;
+            line-height: 1.8;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #00e5ff;
+            letter-spacing: 2px;
+        }
+
+        .logo-img {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+
+            border-radius: 14px;
+
+            border: 2px solid rgba(0, 229, 255, 0.4);
+
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+
+            transition: 0.4s;
+        }
+
+        .logo-img:hover {
+            transform: rotate(8deg) scale(1.08);
+
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.8);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loader">
+        <div class="loader-ring"></div>
+        <div class="loader-text">INITIALIZING AI PORTFOLIO...</div>
+    </div>
+
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="glow glow1"></div>
+    <div class="glow glow2"></div>
+
+    <nav>
+        <!-- <div class="logo">CK</div> -->
+
+        <div class="logo">
+
+            <img src="Photo.png" alt="CK Logo" class="logo-img">
+
+            <!-- <span>CHETAN KALE</span> -->
+
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home">HOME</a></li>
+            <li><a href="#about">ABOUT</a></li>
+            <li><a href="#skills">SKILLS</a></li>
+            <li><a href="#projects">PROJECTS</a></li>
+            <li><a href="#agents">AI AGENTS</a></li>
+            <li><a href="#future">FUTURE TECH</a></li>
+            <li><a href="#contact">CONTACT</a></li>
+
+            <li>
+                <a href="https://drive.google.com/uc?export=download&id=1EenL8e8O3BRWRHRc78CmssgT_H8Hinhh"
+                    target="_blank" class="download-btn">
+
+                    DOWNLOAD CV
+
+                </a>
+            </li>
+
+            <!-- <li>
+                <a href="Chetan_Kale_Resume.pdf" download class="download-btn">
+                    DOWNLOAD CV
+                </a>
+            </li> -->
+        </ul>
+    </nav>
+
+    <!-- PAGE 1 -->
+    <section class="page" id="home">
+        <div class="container">
+            <div class="hero">
+
+                <div class="hero-left">
+                    <div class="hero-subtitle">
+                        PYTHON FULL STACK ENGINEER • AI ENGINEER • AGENTIC AI ARCHITECT
+                    </div>
+
+                    <h1>
+                        CHETAN <br>
+                        <span class="gradient">KALE</span>
+                    </h1>
+
+                    <p>
+                        Advanced Python Full Stack Developer, Backend Engineer, and AI Engineer specializing in
+                        Generative AI, LLM Systems, Multi-Agent AI Architecture, Scalable APIs, Real-Time AI Systems,
+                        Deep Learning, Reinforcement Learning, AI Automation, and Cloud-Native Backend Infrastructure.
+                        Motivated Python Backend Developer with hands-on experience building scalable web applications
+                        using Django, Flask, FastAPI, REST APIs, JWT Authentication, and AI-powered backend systems.
+                    </p>
+
+                    <div class="hero-buttons">
+                        <a href="#projects" class="btn btn-primary">VIEW AI PROJECTS</a>
+                        <a href="#contact" class="btn btn-outline">CONTACT ME</a>
+                    </div>
+                </div>
+
+                <div class="hero-right">
+                    <div class="hero-card">
+                        <div class="card-title">NEXT GENERATION TECHNOLOGY STACK</div>
+                        <div class="big-number">2026+</div>
+                        <div class="tech-grid">
+                            <div class="tech-item">Python</div>
+                            <div class="tech-item">FastAPI</div>
+                            <div class="tech-item">Django</div>
+                            <div class="tech-item">LangChain</div>
+                            <div class="tech-item">CrewAI</div>
+                            <div class="tech-item">LangGraph</div>
+                            <div class="tech-item">TensorFlow</div>
+                            <div class="tech-item">PyTorch</div>
+                            <div class="tech-item">Transformers</div>
+                            <div class="tech-item">LLMs</div>
+                            <div class="tech-item">OpenAI APIs</div>
+                            <div class="tech-item">MCP Servers</div>
+                            <div class="tech-item">Redis</div>
+                            <div class="tech-item">Kafka</div>
+                            <div class="tech-item">PostgreSQL</div>
+                            <div class="tech-item">Docker</div>
+                            <div class="tech-item">Kubernetes</div>
+                            <div class="tech-item">AWS</div>
+                            <div class="tech-item">RAG Pipelines</div>
+                            <div class="tech-item">Vector DB</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE 2 -->
+    <section class="page" id="about">
+        <div class="container">
+
+            <div class="section-title"> ABOUT</div>
+            <h2 class="section-heading">AI ENGINEER PROFILE</h2>
+
+            <div class="about-grid">
+
+                <div class="about-box">
+                    <p>
+                        Experienced Python Full Stack Developer and AI Engineer focused on building futuristic AI
+                        systems, intelligent automation platforms, distributed backend systems, scalable cloud-native
+                        applications, and enterprise-grade generative AI products.
+                    </p>
+
+                    <br>
+
+                    <p>
+                        Specialized in Deep Learning, NLP, LLM Integration, AI Agents, Real-Time Data Streaming, AI
+                        Infrastructure Engineering, and Backend API Development using Django, FastAPI, DRF, WebSockets,
+                        Redis, Celery, and Kafka.
+                    </p>
+
+                    <br>
+
+                    <p>
+                        Passionate about creating advanced AI ecosystems including stock prediction systems, AI
+                        copilots, enterprise chatbots, multi-agent architectures, AI SaaS platforms, autonomous systems,
+                        and intelligent backend services.
+                    </p>
+                </div>
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <h3>25+</h3>
+                        <p>AI Technologies</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>15+</h3>
+                        <p>Enterprise Projects</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>98%</h3>
+                        <p>Backend Scalability</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>24/7</h3>
+                        <p>AI Automation</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="ai-dashboard">
+                <div class="dashboard-card">
+                    <h2>Internship</h2>
+                    <p>Python Full Stack Developer Intern at Naresh IT, Hyderabad (Jan 2023 - Sep 2024)</p>
+                </div>
+                <div class="dashboard-card">
+                    <h2>AI</h2>
+                    <p>LLMs, Agents, NLP, Deep Learning, Reinforcement Learning, AI Automation</p>
+                </div>
+
+                <div class="dashboard-card">
+                    <h2>Backend</h2>
+                    <p>FastAPI, Django, REST APIs, WebSockets, Redis, Celery, Kafka</p>
+                </div>
+
+                <div class="dashboard-card">
+                    <h2>Cloud</h2>
+                    <p>Docker, Kubernetes, AWS, CI/CD, DevOps, Linux Infrastructure</p>
+                </div>
+
+                <div class="dashboard-card">
+                    <h2>Education</h2>
+                    <p>MSc Information Technology (2024 - 2026)<br>BSc Computer Science (2021 - 2024)</p>
+                </div>
+
+                <div class="dashboard-card">
+                    <h2>Certification</h2>
+                    <p>Full Stack Python Development – Naresh IT</p>
+                </div>
+
+                <div class="dashboard-card">
+                    <h2>Data</h2>
+                    <p>PostgreSQL, MongoDB, ChromaDB, Pinecone, FAISS, Vector Search</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PAGE 3 -->
+    <section class="page" id="skills">
+        <div class="container">
+
+            <div class="section-title">SKILLS</div>
+            <h2 class="section-heading">TECHNICAL EXPERTISE</h2>
+
+            <div class="skills-grid">
+
+                <div class="skill-card">
+                    <h3>PROGRAMMING & CORE SKILLS</h3>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>Python</span>
+                            <span>98%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:98%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>SQL</span>
+                            <span>92%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:92%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>JavaScript</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:85%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>Data Structures & Algorithms</span>
+                            <span>88%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:88%"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="skill-card">
+                    <h3>AI / MACHINE LEARNING</h3>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>Machine Learning</span>
+                            <span>96%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:96%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>Deep Learning</span>
+                            <span>94%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:94%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>NLP / LLMs</span>
+                            <span>93%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:93%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>Computer Vision</span>
+                            <span>91%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:91%"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="skill-card">
+                    <h3>BACKEND DEVELOPMENT</h3>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>FastAPI</span>
+                            <span>97%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:97%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>Django REST Framework</span>
+                            <span>96%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:96%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>GraphQL APIs</span>
+                            <span>90%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:90%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>WebSockets</span>
+                            <span>92%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:92%"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="skill-card">
+                    <h3>DEVOPS & CLOUD</h3>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>Docker</span>
+                            <span>95%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:95%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>Kubernetes</span>
+                            <span>88%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:88%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>AWS Cloud</span>
+                            <span>90%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:90%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-top">
+                            <span>CI/CD Pipelines</span>
+                            <span>92%</span>
+                        </div>
+                        <div class="bar">
+                            <div class="fill" style="width:92%"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PAGE 4 -->
+    <section class="page" id="projects">
+        <div class="container">
+
+            <div class="section-title">PROJECTS</div>
+            <h2 class="section-heading">FUTURISTIC AI PROJECTS</h2>
+
+            <div class="projects-grid">
+
+                <div class="project-card">
+                    <div class="project-image">🗄️</div>
+                    <h3>AI-POWERED DATABASE QUERY CHATBOT</h3>
+                    <p>
+                        Developed an AI-powered chatbot that converts natural language into SQL queries using LLMs and
+                        FastAPI. Integrated MySQL and PostgreSQL databases with context-aware intelligent responses,
+                        query validation, and optimized backend performance.
+                    </p>
+                    <div class="tags">
+                        <div class="tag">LLM</div>
+                        <div class="tag">FastAPI</div>
+                        <div class="tag">MySQL</div>
+                        <div class="tag">PostgreSQL</div>
+                        <div class="tag">Generative AI</div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image">🤖</div>
+                    <h3>AI MULTI-AGENT SYSTEM</h3>
+                    <p>
+                        Enterprise-grade autonomous AI agents using LangGraph, CrewAI, FastAPI, and LLM orchestration
+                        with advanced task automation and intelligent workflow execution.
+                    </p>
+                    <div class="tags">
+                        <div class="tag">LangGraph</div>
+                        <div class="tag">CrewAI</div>
+                        <div class="tag">FastAPI</div>
+                        <div class="tag">LLM</div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image">📈</div>
+                    <h3>REAL-TIME STOCK AI ENGINE</h3>
+                    <p>
+                        Advanced stock forecasting platform using LSTM, Transformers, Reinforcement Learning,
+                        WebSockets, Kafka, and real-time market prediction pipelines.
+                    </p>
+                    <div class="tags">
+                        <div class="tag">LSTM</div>
+                        <div class="tag">Transformers</div>
+                        <div class="tag">RL</div>
+                        <div class="tag">Kafka</div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image">🧠</div>
+                    <h3>RAG ENTERPRISE CHATBOT</h3>
+                    <p>
+                        AI chatbot integrating PDFs, databases, vector search, embeddings, and LLM-powered retrieval
+                        systems for enterprise knowledge automation.
+                    </p>
+                    <div class="tags">
+                        <div class="tag">RAG</div>
+                        <div class="tag">ChromaDB</div>
+                        <div class="tag">OpenAI</div>
+                        <div class="tag">Embeddings</div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image">🎙️</div>
+                    <h3>AI VOICE ASSISTANT</h3>
+                    <p>
+                        Speech-to-text and text-to-speech intelligent AI assistant with multilingual voice recognition
+                        and conversational memory.
+                    </p>
+                    <div class="tags">
+                        <div class="tag">Whisper</div>
+                        <div class="tag">TTS</div>
+                        <div class="tag">Speech AI</div>
+                        <div class="tag">NLP</div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image">🌐</div>
+                    <h3>AI SAAS PLATFORM</h3>
+                    <p>
+                        Scalable AI SaaS platform providing multiple AI tools, authentication systems, subscriptions,
+                        dashboards, and cloud infrastructure.
+                    </p>
+                    <div class="tags">
+                        <div class="tag">SaaS</div>
+                        <div class="tag">Stripe</div>
+                        <div class="tag">Cloud</div>
+                        <div class="tag">Docker</div>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image">⚡</div>
+                    <h3>REAL-TIME TASK SYSTEM</h3>
+                    <p>
+                        Distributed asynchronous backend system using Celery, Redis, RabbitMQ, Kafka, and
+                        WebSocket-based real-time event processing.
+                    </p>
+                    <div class="tags">
+                        <div class="tag">Celery</div>
+                        <div class="tag">Redis</div>
+                        <div class="tag">RabbitMQ</div>
+                        <div class="tag">WebSockets</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PAGE 5 -->
+    <section class="page" id="agents">
+        <div class="container">
+
+            <div class="section-title">AI AGENTS</div>
+            <h2 class="section-heading">AGENTIC AI SYSTEMS</h2>
+
+            <div class="agent-grid">
+
+                <div class="agent-card">
+                    <h3>AI RESEARCH AGENT</h3>
+                    <p>
+                        Autonomous AI agent capable of internet research, summarization, report generation, and
+                        intelligent data extraction.
+                    </p>
+                </div>
+
+                <div class="agent-card">
+                    <h3>AI CODING AGENT</h3>
+                    <p>
+                        LLM-powered coding assistant capable of generating APIs, debugging systems, and software
+                        architecture automation.
+                    </p>
+                </div>
+
+                <div class="agent-card">
+                    <h3>AI BUSINESS AGENT</h3>
+                    <p>
+                        Intelligent automation agent for business workflows, analytics, communication, and enterprise AI
+                        decision systems.
+                    </p>
+                </div>
+
+                <div class="agent-card">
+                    <h3>AI TRADING AGENT</h3>
+                    <p>
+                        Real-time financial market AI agent integrating reinforcement learning, prediction engines, and
+                        automated strategies.
+                    </p>
+                </div>
+
+                <div class="agent-card">
+                    <h3>AI DATABASE AGENT</h3>
+                    <p>
+                        Natural language to SQL intelligent system with database optimization, query generation, and
+                        analytics.
+                    </p>
+                </div>
+
+                <div class="agent-card">
+                    <h3>AI DOCUMENT AGENT</h3>
+                    <p>
+                        Enterprise-grade document understanding system capable of analyzing PDFs, contracts, invoices,
+                        and reports.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PAGE 6 -->
+    <section class="page" id="future">
+        <div class="container">
+
+            <div class="section-title">FUTURE TECHNOLOGIES</div>
+            <h2 class="section-heading">FUTURE TECHNOLOGIES</h2>
+
+            <div class="future-grid">
+
+                <div class="future-card">
+                    <h3>AGENTIC AI</h3>
+                    <p>
+                        Autonomous AI systems capable of reasoning, memory management, tool calling, and intelligent
+                        task execution.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>EDGE AI</h3>
+                    <p>
+                        Deploying intelligent AI systems directly on edge devices for ultra-low latency and real-time
+                        processing.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>AI ROBOTICS</h3>
+                    <p>
+                        Advanced robotics integrated with computer vision, reinforcement learning, and autonomous
+                        navigation systems.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>QUANTUM AI</h3>
+                    <p>
+                        Combining quantum computing with AI algorithms to accelerate future machine learning systems.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>DIGITAL TWINS</h3>
+                    <p>
+                        Creating intelligent digital replicas of systems, businesses, and industrial environments using
+                        AI.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>AUTONOMOUS SYSTEMS</h3>
+                    <p>
+                        Self-operating intelligent platforms integrating AI agents, automation, IoT, and distributed
+                        cloud infrastructure.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PAGE 7 -->
+    <!-- <section class="page">
+        <div class="container">
+
+            <div class="section-title">06 EXPERIENCE</div>
+            <h2 class="section-heading">CAREER TIMELINE</h2>
+
+            <div class="timeline">
+
+                <div class="timeline-card">
+                    <div class="timeline-year">2026</div>
+                    <h3>AI ENGINEER & GENERATIVE AI DEVELOPER</h3>
+                    <p>
+                        Developed advanced AI systems, LLM applications, RAG pipelines, AI agents, and enterprise AI
+                        backend architectures.
+                    </p>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="timeline-year">2025</div>
+                    <h3>AI & BACKEND ENGINEER</h3>
+                    <p>
+                        Developed AI-powered database chatbot systems, stock prediction engines, and intelligent FastAPI
+                        backend architectures with real-time processing and AI automation.
+                    </p>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="timeline-year">2024</div>
+                    <h3>PYTHON FULL STACK DEVELOPER INTERN – NARESH IT</h3>
+                    <p>
+                        Worked on Django, Flask, FastAPI, JWT Authentication, REST API development, database
+                        optimization, debugging backend modules, and Agile software development.
+                    </p>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="timeline-year">2025</div>
+                    <h3>BACKEND API ENGINEER</h3>
+                    <p>
+                        Built scalable FastAPI and Django backend systems with authentication, WebSockets, Celery,
+                        Redis, and real-time APIs.
+                    </p>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="timeline-year">2024</div>
+                    <h3>MACHINE LEARNING ENGINEER</h3>
+                    <p>
+                        Worked on stock prediction systems, CNN computer vision models, NLP applications, and predictive
+                        analytics engines.
+                    </p>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="timeline-year">2023</div>
+                    <h3>PYTHON FULL STACK DEVELOPER</h3>
+                    <p>
+                        Created Django full stack applications, REST APIs, authentication systems, dashboards, and
+                        automation tools.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </section> -->
+
+
+
+    <!-- PAGE 6 -->
+    <section class="page" id="future">
+        <div class="container">
+
+            <div class="section-title">05 GROWTH ROADMAP</div>
+            <h2 class="section-heading">
+                CONTINUOUS LEARNING & FUTURE SKILLS
+            </h2>
+
+            <div class="future-grid">
+
+                <div class="future-card">
+                    <h3>GENERATIVE AI ENGINEERING</h3>
+                    <p>
+                        Continuously improving expertise in Large Language Models (LLMs),
+                        Prompt Engineering, AI Automation, OpenAI APIs,
+                        HuggingFace Transformers, and enterprise AI systems.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>MULTI-AGENT AI SYSTEMS</h3>
+                    <p>
+                        Learning advanced Agentic AI architectures using LangGraph,
+                        CrewAI, AutoGen, MCP Servers, memory systems,
+                        and autonomous AI workflows.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>ADVANCED BACKEND ENGINEERING</h3>
+                    <p>
+                        Growing expertise in scalable backend systems using FastAPI,
+                        Django REST Framework, WebSockets, Redis,
+                        Celery, Kafka, GraphQL, and microservices architecture.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>CLOUD & DEVOPS</h3>
+                    <p>
+                        Expanding cloud-native development skills with Docker,
+                        Kubernetes, AWS, CI/CD pipelines,
+                        Linux server management, and infrastructure automation.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>DEEP LEARNING & AI RESEARCH</h3>
+                    <p>
+                        Exploring advanced Deep Learning, Reinforcement Learning,
+                        Transformers, Computer Vision,
+                        NLP, and real-time AI model optimization techniques.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>FULL STACK AI APPLICATIONS</h3>
+                    <p>
+                        Building modern AI-powered full stack applications using
+                        React, Next.js, Tailwind CSS,
+                        FastAPI, PostgreSQL, and real-time AI integrations.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>REAL-TIME DATA SYSTEMS</h3>
+                    <p>
+                        Developing high-performance real-time systems using Kafka,
+                        WebSockets, Redis Streams,
+                        asynchronous processing, and live AI analytics pipelines.
+                    </p>
+                </div>
+
+                <div class="future-card">
+                    <h3>ENTERPRISE AI PRODUCTS</h3>
+                    <p>
+                        Focused on creating scalable AI SaaS products,
+                        AI copilots, enterprise chatbots,
+                        intelligent automation platforms, and cloud AI services.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+
+
+    <!-- PAGE 8 -->
+    <section class="page" id="contact">
+
+        <div class="container">
+
+            <div class="contact-section">
+
+                <div class="section-title">
+                    07 CONTACT
+                </div>
+
+                <h2>
+                    LET'S BUILD AI TOGETHER
+                </h2>
+
+                <p>
+                    Open for AI Engineer, Backend Developer, Python Full Stack Developer,
+                    Generative AI Engineer, Machine Learning Engineer,
+                    and AI Research opportunities.
+                </p>
+
+                <div class="contact-grid">
+
+                    <!-- LINKEDIN -->
+
+                    <a href="https://www.linkedin.com/in/chetankale-9a16b8353" target="_blank"
+                        class="contact-card social-card">
+
+                        <div class="social-icon linkedin-bg">
+                            <img src="LINKEDIN.png" alt="LinkedIn">
+                        </div>
+
+                        <h4>LINKEDIN</h4>
+
+                        <p>
+                            Connect professionally and explore my AI,
+                            Backend, and Python development journey.
+                        </p>
+
+                    </a>
+
+                    <!-- GITHUB -->
+
+                    <a href="https://github.com/" target="_blank" class="contact-card social-card">
+
+                        <div class="social-icon github-bg">
+                            <img src="GITHUB.png" alt="GitHub">
+                        </div>
+
+                        <h4>GITHUB</h4>
+
+                        <p>
+                            Explore my projects, AI systems,
+                            backend APIs, and open-source development work.
+                        </p>
+
+                    </a>
+
+                    <!-- EMAIL -->
+
+                    <a href="mailto:chetankale1800@gmail.com" class="contact-card social-card">
+
+                        <div class="social-icon email-bg">
+                            <img src="EMAIL.png" alt="Email">
+                        </div>
+
+                        <h4>EMAIL</h4>
+
+                        <p>
+                            chetankale1800@gmail.com
+                        </p>
+
+                    </a>
+
+                    <!-- PHONE -->
+
+                    <a href="#" class="contact-card social-card" id="contactAction">
+
+                        <div class="social-icon phone-bg">
+                            <img src="PHONE.png" alt="Phone">
+                        </div>
+
+                        <h4>PHONE / WHATSAPP</h4>
+
+                        <p>
+                            +91 8446274030
+                        </p>
+
+                    </a>
+
+
+
+                    <!-- LOCATION -->
+
+                    <div class="contact-card social-card">
+
+                        <div class="social-icon location-bg">
+                            <img src="LOCATION.png" alt="Location">
+                        </div>
+
+                        <h4>LOCATION</h4>
+
+                        <p>
+                            Pune, Maharashtra, India
+                        </p>
+
+                    </div>
+
+                    <!-- SPECIALIZATION -->
+
+                    <div class="contact-card social-card">
+
+                        <div class="social-icon ai-bg">
+                            <img src="SPECIALIZATION.png" alt="AI">
+                        </div>
+
+                        <h4>SPECIALIZATION</h4>
+
+                        <p>
+                            AI Engineering, FastAPI Backend Systems,
+                            Generative AI, and Agentic AI Development
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PAGE 8
+    <section class="page" id="contact">
+        <div class="container">
+
+            <div class="contact-section">
+                <div class="section-title">07 CONTACT</div>
+                <h2>LET'S BUILD AI TOGETHER</h2>
+
+                <p>
+                    Open for AI Engineer, Backend Developer, Full Stack Developer, Machine Learning Engineer, Generative
+                    AI Engineer, and AI Research opportunities.
+                </p>
+
+                <div class="contact-grid">
+
+                    <div class="contact-card">
+                        <h4>LINKEDIN</h4>
+                        <p>linkedin.com/in/chetankale-9a16b8353</p>
+                    </div>
+
+                    <div class="contact-card">
+                        <h4>EMAIL</h4>
+                        <p>chetankale1800@gmail.com</p>
+                    </div>
+
+                    <div class="contact-card">
+                        <h4>PHONE</h4>
+                        <p>+91 8446274030</p>
+                    </div>
+
+                    <div class="contact-card">
+                        <h4>LOCATION</h4>
+                        <p>Pune, Maharashtra, India</p>
+                    </div>
+
+                    <div class="contact-card">
+                        <h4>SPECIALIZATION</h4>
+                        <p>AI Engineering & Python Backend Systems</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section> -->
+
+    <footer>
+        © 2026 CHETAN KALE • AI ENGINEER • PYTHON FULL STACK ENGINEER • AGENTIC AI ARCHITECT
+    </footer>
+
+    <script>
+
+
+
+        const contactAction = document.getElementById("contactAction");
+
+        const isMobile =
+            /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+
+        if (isMobile) {
+
+            // MOBILE → OPEN CALL DIALER
+            contactAction.href = "tel:+918446274030";
+
+        } else {
+
+            // PC/LAPTOP → OPEN WHATSAPP
+            contactAction.href =
+                "https://wa.me/918446274030";
+
+        }
+
+
+        window.addEventListener('load', () => {
+            gsap.to('#loader', {
+                opacity: 0,
+                duration: 1,
+                onComplete: () => {
+                    document.getElementById('loader').style.display = 'none';
+                }
+            });
+        });
+
+        const canvas = document.getElementById('bgCanvas');
+
+        const scene = new THREE.Scene();
+
+        const camera = new THREE.PerspectiveCamera(
+            75,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            alpha: true
+        });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.z = 5;
+
+        const geometry = new THREE.BufferGeometry();
+
+        const particleCount = 4000;
+
+        const positions = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i++) {
+            positions[i] = (Math.random() - 0.5) * 20;
+        }
+
+        geometry.setAttribute(
+            'position',
+            new THREE.BufferAttribute(positions, 3)
+        );
+
+        const material = new THREE.PointsMaterial({
+            color: 0x00e5ff,
+            size: 0.02
+        });
+
+        const particles = new THREE.Points(
+            geometry,
+            material
+        );
+
+        scene.add(particles);
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            particles.rotation.y += 0.0007;
+            particles.rotation.x += 0.0003;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+        });
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.from('.hero-left', {
+            opacity: 0,
+            y: 80,
+            duration: 1.2
+        });
+
+        gsap.from('.hero-right', {
+            opacity: 0,
+            x: 80,
+            duration: 1.2
+        });
+
+        gsap.utils.toArray('.skill-card,.project-card,.service-card,.future-card,.agent-card,.timeline-card,.contact-card,.about-box,.dashboard-card').forEach(card => {
+
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 85%'
+                },
+                opacity: 0,
+                y: 60,
+                duration: 1
+            });
+
+        });
+
+    </script>
+
+</body>
+
+</html>
